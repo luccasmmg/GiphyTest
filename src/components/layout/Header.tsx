@@ -1,10 +1,11 @@
 import * as React from 'react';
+import UnstyledLink from '../links/UnstyledLink';
 
-import UnstyledLink from '@/components/links/UnstyledLink';
+//import UnstyledLink from '../components/links/UnstyledLink';
 
 const links = [
-  { href: '/', label: 'Route 1' },
-  { href: '/', label: 'Route 2' },
+  { href: '/page_1', label: 'Route 1' },
+  { href: '/page_2', label: 'Route 2' },
 ];
 
 export default function Header() {
@@ -16,10 +17,10 @@ export default function Header() {
         </UnstyledLink>
         <nav>
           <ul className='flex items-center justify-between space-x-4'>
-            {links.map(({ href, label }) => (
-              <li key={`${href}${label}`}>
-                <UnstyledLink href={href} className='hover:text-gray-600'>
-                  {label}
+            {links.map((link) => (
+              <li key={`${link.href}${link.label}`}>
+                <UnstyledLink href={link.href} className='hover:text-gray-600'>
+                  {link.label}
                 </UnstyledLink>
               </li>
             ))}

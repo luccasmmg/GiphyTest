@@ -1,74 +1,92 @@
-import * as React from 'react';
+import { Form, Field, Formik } from 'formik'
+import Image from 'next/image'
 
-import Layout from '@/components/layout/Layout';
-import ArrowLink from '@/components/links/ArrowLink';
-import ButtonLink from '@/components/links/ButtonLink';
-import UnderlineLink from '@/components/links/UnderlineLink';
-import UnstyledLink from '@/components/links/UnstyledLink';
-import Seo from '@/components/Seo';
+import Layout from '../components/layout/Layout';
+import Seo from '../components/Seo';
+import Header from '../components/layout/Header';
+import { useState } from 'react';
 
-/**
- * SVGR Support
- * Caveat: No React Props Type.
- *
- * You can override the next-env if the type is important to you
- * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
- */
-import Vercel from '~/svg/Vercel.svg';
+export interface InitialValues {
+  search: string
+}
 
-// !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
-// Before you begin editing, follow all comments with `STARTERCONF`,
-// to customize the default configuration.
+const PopUp = ({ gif, visible, back, previous, next, index }: any) => {
+  return (
+    <div className='flex flex-col'>
+      <div
+        className={`overflow-auto \
+              z-30 \
+              mx-auto \
+              top-20 \
+              p-6 \
+              bg-white \
+              text-left \
+              fixed \
+              ${visible ? 'visible' : 'invisible'}`}><Image className='w-full' width={400} height={400} src={gif} />
+      </div>
+      <button className='dark:bg-purple-400 bg-purple-700
+  dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
+  font-medium rounded p-2 my-2' onClick={back}>Go back</button>
+      {index != 0 &&
+        <button className='dark:bg-purple-400 bg-purple-700
+  dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
+  font-medium rounded p-2 my-2 w-full' onClick={previous}>Previous</button>}
+      <button className='dark:bg-purple-400 bg-purple-700
+  dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
+  font-medium rounded p-2 my-2 w-full' onClick={next}>Next</button>
+    </div>
+  )
+}
 
 export default function HomePage() {
+  const [offset, setOffset] = useState(0);
+  const [gifs, setGifs] = useState([]);
+  const [currentGifIndex, setCurrentGifIndex] = useState(0);
+  const [visiblePopUp, setVisiblePopUP] = useState(false);
+  const [limit, setLimit] = useState(10);
   return (
     <Layout>
-      {/* <Seo templateTitle='Home' /> */}
       <Seo />
-
-      <main>
-        <section className='bg-white'>
-          <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-            <Vercel className='text-5xl' />
-            <h1 className='mt-4'>
-              Next.js + Tailwind CSS + TypeScript Starter
-            </h1>
-            <p className='mt-2 text-sm text-gray-800'>
-              A starter for Next.js, Tailwind CSS, and TypeScript with Absolute
-              Import, Seo, Link component, pre-configured with Husky{' '}
-            </p>
-            <p className='mt-2 text-sm text-gray-700'>
-              <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
-                See the repository
-              </ArrowLink>
-            </p>
-
-            <ButtonLink className='mt-6' href='/components' variant='light'>
-              See all components
-            </ButtonLink>
-
-            <UnstyledLink
-              href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter'
-              className='mt-4'
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                width='92'
-                height='32'
-                src='https://vercel.com/button'
-                alt='Deploy with Vercel'
+      <Header />
+      <main className="min-h-main flex justify-center items-center flex-col md:px-24">
+        <Formik initialValues={{ search: '' }} onSubmit={async ({ search }: any) => {
+          const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=v54hYaQ1qhd4G9OsDiViA08Ij3PBy38n&q=${search}&offset=${offset}&limit=${limit}`)
+          const new_gifs = await res.json()
+          setGifs(gifs.concat(new_gifs.data))
+          setOffset(offset + 10)
+          setLimit(limit + 10)
+        }}><Form>
+            <div className='flex flex-col'>
+              <Field
+                placeholder='Search bar'
+                name='search'
+                type='search'
               />
-            </UnstyledLink>
-
-            <footer className='absolute bottom-2 text-gray-700'>
-              © {new Date().getFullYear()} By{' '}
-              <UnderlineLink href='https://theodorusclarence.com?ref=tsnextstarter'>
-                Theodorus Clarence
-              </UnderlineLink>
-            </footer>
-          </div>
-        </section>
+              <button className='dark:bg-purple-400 bg-purple-700
+  dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
+  font-medium rounded p-2 my-2' type='submit'>{gifs.length > 0 ? 'More' : 'Search'}</button>
+              <button className='dark:bg-gray-200 bg-transparent
+  hover:bg-purple-700 text-purple-700 font-medium hover:text-white border border-purple-700 hover:border-transparent rounded w-full p-2 my-2' onClick={() => {
+                  setGifs([])
+                  setOffset(0)
+                  setLimit(10)
+                }}>Clear</button>
+            </div>
+          </Form></Formik>
+        <div className='w-full flex flex-wrap flex-row mx-8'>
+          {gifs.length > 0 &&
+            gifs.map((gif, index) => {
+              return (<div onClick={() => {
+                setVisiblePopUP(true)
+                setCurrentGifIndex(index)
+              }}><Image width={60} height={60} src={gif.images.preview_gif.url} /></div>)
+            })}
+        </div>
+        {currentGifIndex != 0 &&
+          <PopUp visible={visiblePopUp} index={currentGifIndex} gif={gifs[currentGifIndex].images.original.url} back={() => setVisiblePopUP(!visiblePopUp)} next={() => setCurrentGifIndex(currentGifIndex + 1)} previous={() => setCurrentGifIndex(currentGifIndex - 1)} />
+        }
       </main>
+      <footer>Footer Home</footer>
     </Layout>
   );
 }

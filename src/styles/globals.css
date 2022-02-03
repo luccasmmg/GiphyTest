@@ -28,6 +28,20 @@
   /* #endregion  /**======== Primary Color =========== */
 }
 
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+header {
+  padding: 2rem;
+}
+
+footer {
+  padding: 2rem;
+  text-align: center;
+}
+
 @layer base {
   /* inter var - latin */
   @font-face {
