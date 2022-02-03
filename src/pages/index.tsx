@@ -12,7 +12,6 @@ export interface InitialValues {
 
 const PopUp = ({ gif, visible, back, previous, next, index }: any) => {
   return (
-    <div className='flex flex-col'>
       <div
         className={`overflow-auto \
               z-30 \
@@ -22,8 +21,9 @@ const PopUp = ({ gif, visible, back, previous, next, index }: any) => {
               bg-white \
               text-left \
               fixed \
-              ${visible ? 'visible' : 'invisible'}`}><Image className='w-full' width={400} height={400} src={gif} />
-      </div>
+              ${visible ? 'visible' : 'invisible'}`}>
+          <Image className='w-full' width={400} height={400} src={gif} />
+    <div className='flex flex-col'>
       <button className='dark:bg-purple-400 bg-purple-700
   dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
   font-medium rounded p-2 my-2' onClick={back}>Go back</button>
@@ -34,14 +34,15 @@ const PopUp = ({ gif, visible, back, previous, next, index }: any) => {
       <button className='dark:bg-purple-400 bg-purple-700
   dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
   font-medium rounded p-2 my-2 w-full' onClick={next}>Next</button>
-    </div>
+          </div>
+      </div>
   )
 }
 
 export default function HomePage() {
   const [offset, setOffset] = useState(0);
   const [gifs, setGifs] = useState([]);
-  const [currentGifIndex, setCurrentGifIndex] = useState(0);
+  const [currentGifIndex, setCurrentGifIndex] = useState(-1);
   const [visiblePopUp, setVisiblePopUP] = useState(false);
   const [limit, setLimit] = useState(10);
   return (
@@ -49,12 +50,15 @@ export default function HomePage() {
       <Seo />
       <Header />
       <main className="min-h-main flex justify-center items-center flex-col md:px-24">
-        <Formik initialValues={{ search: '' }} onSubmit={async ({ search }: any) => {
+        <div className='flex flex-col max-w-14'>
+          <Formik initialValues={{ search: '' }} onSubmit={async ({ search }: any, { resetForm }) => {
+              console.log('submitting');
           const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=v54hYaQ1qhd4G9OsDiViA08Ij3PBy38n&q=${search}&offset=${offset}&limit=${limit}`)
           const new_gifs = await res.json()
           setGifs(gifs.concat(new_gifs.data))
           setOffset(offset + 10)
           setLimit(limit + 10)
+          resetForm({ values: { search } })
         }}><Form>
             <div className='flex flex-col'>
               <Field
@@ -65,14 +69,16 @@ export default function HomePage() {
               <button className='dark:bg-purple-400 bg-purple-700
   dark:hover:bg-purple-700 hover:bg-purple-900 dark:text-black text-white
   font-medium rounded p-2 my-2' type='submit'>{gifs.length > 0 ? 'More' : 'Search'}</button>
+            </div>
+          </Form></Formik>
               <button className='dark:bg-gray-200 bg-transparent
   hover:bg-purple-700 text-purple-700 font-medium hover:text-white border border-purple-700 hover:border-transparent rounded w-full p-2 my-2' onClick={() => {
                   setGifs([])
                   setOffset(0)
                   setLimit(10)
+                  setCurrentGifIndex(-1)
                 }}>Clear</button>
             </div>
-          </Form></Formik>
         <div className='w-full flex flex-wrap flex-row mx-8'>
           {gifs.length > 0 &&
             gifs.map((gif, index) => {
@@ -82,7 +88,7 @@ export default function HomePage() {
               }}><Image width={60} height={60} src={gif.images.preview_gif.url} /></div>)
             })}
         </div>
-        {currentGifIndex != 0 &&
+        {currentGifIndex != -1 &&
           <PopUp visible={visiblePopUp} index={currentGifIndex} gif={gifs[currentGifIndex].images.original.url} back={() => setVisiblePopUP(!visiblePopUp)} next={() => setCurrentGifIndex(currentGifIndex + 1)} previous={() => setCurrentGifIndex(currentGifIndex - 1)} />
         }
       </main>

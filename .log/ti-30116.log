@@ -1,0 +1,16 @@
+[21:16:52.848] Global cache location '/home/urutu-branco/.cache/typescript/4.5', safe file path '/home/urutu-branco/Projetos/base-project/node_modules/typescript/lib/typingSafeList.json', types map path /home/urutu-branco/Projetos/base-project/node_modules/typescript/lib/typesMap.json
+[21:16:52.848] Processing cache location '/home/urutu-branco/.cache/typescript/4.5'
+[21:16:52.848] Trying to find '/home/urutu-branco/.cache/typescript/4.5/package.json'...
+[21:16:52.849] Finished processing cache location '/home/urutu-branco/.cache/typescript/4.5'
+[21:16:52.849] Process id: 30123
+[21:16:52.850] NPM location: /usr/bin/npm (explicit '--npmLocation' not  provided)
+[21:16:52.850] validateDefaultNpmLocation: false
+[21:16:52.850] Npm config file: /home/urutu-branco/.cache/typescript/4.5/package.json
+[21:16:52.850] Updating types-registry npm package...
+[21:16:52.850] Exec: /usr/bin/npm install --ignore-scripts types-registry@latest
+[21:16:52.858]     Failed. stdout:
+    stderr:
+    /bin/sh: linha 1: /usr/bin/npm: Arquivo ou diretório inexistente
+    
+[21:16:52.858] Updated types-registry npm package
+[21:16:52.858] Types registry file '/home/urutu-branco/.cache/typescript/4.5/node_modules/types-registry/index.json' does not exist
